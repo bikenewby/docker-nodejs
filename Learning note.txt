@@ -1,0 +1,50 @@
+- Build with command below (command prompt under folder containing Dockerfile).
+"docker build -t sudduenk/testnodejsapp ."
+
+- Run with command below. Node that port used by node.js needs to map out to host machine
+"docker run -p 8080:8080 sudduenk/testnodejsapp"
+
+- Attach to running container with shell command by:
+"docker exec -it [container_id] /bin/bash"
+
+- Run with passing environment variable
+"docker run -e "VAR1=Value" [image_name]"
+Note that can test environment variable using linux's env command e.g., docker run -e "VAR1=Value" [image_name] env
+To refer to value of environment variable (inside docker container) uses $VAR1
+
+- To run only command shell from built image (w/o running NodeJS app). Note that -it specified that container will need to take input from terminal. "sh" is command shell available in alpine linux (/bin/bash is not available in alpine)
+"docker run -it sudduenk/testnodejsapp sh"
+
+- To list dangling docker image (image that is not associated with any container)
+"docker images -f dangling=true"
+
+- To remove every unused (clean) docker use below command. This will also remove "dangling" docker image that are not associated with any container.
+"docker system prune"
+
+- To remove any stopped containers and all unused images. DO NOT USE this one unless need to clean all images not under docker ps -a
+"docker system prune -a"
+
+- To remove all containers. Note that this can only be run in linux shell windows. docker ps -a list all containers whether already exited or not. -q make result short by just returning container id.
+"docker rm $(docker ps -aq)"
+
+- To pull docker image without running it
+"docker pull [image_name]"
+
+- To find image from Dockerhub
+=> Goto Docker Hub => Click Explore => find or search => Click to view detail. Note that tag info shows version of needed software and if there is alpine in tag name mean the image contains required software installed on alpine (bare minimum). If no version number then it is latest.
+
+- Useful docker commands:
+https://www.digitalocean.com/community/tutorials/how-to-remove-docker-images-containers-and-volumes
+https://igokuz.com/docker-command-%E0%B9%80%E0%B8%9A%E0%B8%B7%E0%B9%89%E0%B8%AD%E0%B8%87%E0%B8%95%E0%B9%89%E0%B8%99-101-df1a7fb2a24c
+
+- On Dokerfile there are 4 key commands "BASE", "RUN", "COPY", "CMD"
+BASE is to specify base image
+RUN is to specify command to run on that base image to install stuffs. In case of alpine, "apk add --update xxx" means to use Alpine's package manager to install/update software. See https://pkgs.alpinelinux.org/packages for list od packaged software that is available.
+COPY is to copy file from local drive (from same directory as Dockerfile to docker image)
+CMD indicates commmand to run as container start-up
+
+- View docker image metadata (including CMD start-up commabd)
+"docker image inspect [image_name]"
+
+- Define restart policy in docker-compose.yml (under each service) to automatically restart container
+e.g., restart=always (always restart if container exited. Also always restarted if docker is reboooted.) or restart=on-failure (if container exit with status <> 0) or restart=unless-stopped (similar to always except that if container is stopped before docker rebooted, it will not be automatically restarted), default restart="no" (with double quotes). Note that can also specify max retry e.g., restart=on-failure:5
